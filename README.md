@@ -1,3 +1,4 @@
+#Blender 2.8 addon:
 # View_Layers to EXR Fileouts
 
 This add on is a tool to take all the view_layers in the scene and connect each to a fileout node in the Compositor - adding each pass to an input (to be saved as a layer in the EXR output file).
