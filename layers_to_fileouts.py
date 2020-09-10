@@ -64,25 +64,46 @@ def create_node(node_type):
     return bpy.context.scene.node_tree.nodes.new(type)
 
 
-def formal_node_name(stem, layer):
+def formal_node_name(node, layer):
+    '''Produce a formal node name from the node and the layer name'''
+    stem = node_stem_from_type(node)
 
     return "{} - {}".format(stem, layer)
 
 
-def rename_and_relabel_node(node, layer_name, other=''):
+def rename_and_relabel_node(node, layer_name):
     '''Rename and Re-label a node appended with the view_layer name'''
 
+    node.name = formal_node_name(node, layer_name)
+    node.label = node.name
+
+
+def formal_denoise_node_name(node, layer, output):
+    '''Produce a formal node name from the node and the layer name'''
+    stem = node_stem_from_type(node)
+
+    return "{}-{} - {}".format(stem, output, layer)
+
+
+def rename_and_relabel_denoise_node(node, layer_name, output):
+    '''Rename and Re-label a node appended with the view_layer name'''
+
+    node.name = formal_denoise_node_name(node, layer_name, output)
+    node.label = node.name
+
+    
+def node_stem_from_type(node):
+    '''Get formal name stem from node type'''
     if node.type == 'R_LAYERS':
         stem = "Render_Layers"
 
     elif node.type == 'DENOISE':
-        stem = "Denoise-{}".format(other)
+        stem = "Denoise"
 
     elif node.type == 'OUTPUT_FILE':
         stem = "EXR_File_Output"
 
-    node.name = formal_node_name(stem, layer_name)
-    node.label = node.name
+    return stem
 
 
 def reposition_node(node, x, y):
@@ -120,6 +141,7 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
     bl_options = {'REGISTER', 'UNDO'}           
+
 
     def execute(self, context):
         
@@ -169,7 +191,7 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         # ------------------- Set up empty lists and dicts -------------------- #
 
         # Keep track of view_layers that have a Render Layer node assigned:
-        processed_layers = []
+        processed_layers = list()
 
         # Dictionary to store the Render Layer nodes with the view_layer as a value
         render_layer_nodes = dict()
@@ -183,11 +205,24 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         # List all nodes:
         all_nodes = get_nodes()
 
+        # Check if any existing Render Layers nodes have the formal naming:
+        # e.g., "Render Layers - my_view_layer"
+        for node in all_nodes:
+            # check for Render Layers nodes
+            if node.type == 'R_LAYERS':
+                # Get any view layer set on the Render Layers node:
+                layer = renderlayer_nodes_view_layer(node)
+                # Check if name is a formal name (meaning a new one is not required):
+                if node.name == formal_node_name(node, layer):
+                    # add to dictionary to use later (repositioning and linking):
+                    render_layer_nodes[node] = layer
+                    # flag as processed to skip the view_layer from here on:
+                    processed_layers.append(layer)
 
         # --------------- Process existing Render Layers nodes ---------------- #
 
         # Specify y value and left-most and rightmost placement for nodes
-        x1, y, x2 = (0, 0, 1400)
+        x1, x2, y = (0, 1400, 0)
 
         # Process the Render Layer nodes if any exist:
         # rename with view layers and add to processed layers list:
@@ -222,8 +257,6 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
 
         # List remaining view_layers that don't have Render Layers nodes):
         remaining = list(i for i in layers if i not in processed_layers)
-        print("processed : ", processed_layers)
-        print("Remaining : ", remaining)
         
         # Create a new Render Layers node for each remaining view_layer:
         for layer in remaining:
@@ -325,7 +358,7 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                     # Create a denoise node
                     denoise_node = create_node("Denoising")
                     # Rename and re-label the new node with layer suffix
-                    rename_and_relabel_node(denoise_node, layer, output)
+                    rename_and_relabel_denoise_node(denoise_node, layer, output)
                     # Position the denoise node between Render Layers and File Out
                     reposition_node(denoise_node, (x1+x2)/2, y_loc)
                     # If view_layer is disabled, mute denoise node:
