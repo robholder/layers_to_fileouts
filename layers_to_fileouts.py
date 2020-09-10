@@ -64,7 +64,12 @@ def create_node(node_type):
     return bpy.context.scene.node_tree.nodes.new(type)
 
 
-def rename_and_relabel_node(node, layer, other=''):
+def formal_node_name(stem, layer):
+
+    return "{} - {}".format(stem, layer)
+
+
+def rename_and_relabel_node(node, layer_name, other=''):
     '''Rename and Re-label a node appended with the view_layer name'''
 
     if node.type == 'R_LAYERS':
@@ -76,26 +81,8 @@ def rename_and_relabel_node(node, layer, other=''):
     elif node.type == 'OUTPUT_FILE':
         stem = "EXR_File_Output"
 
-    node.name = "{} - {}".format(stem, layer)
+    node.name = formal_node_name(stem, layer_name)
     node.label = node.name
-
-
-def log_node_position_extremes(u, v):
-    '''Return coordinates if node is right/left-most and/or lower-most'''
-    global x1, y, x2
-
-    # Get left-most and lower-most node position
-    if u < x1:
-        x1 = u
-    if v < y:
-        y = v
-    if y < -900:
-        y = -900
-    # Get right-most node position
-    if u > x2:
-        x2 = u
-
-    return x1, y, x2
 
 
 def reposition_node(node, x, y):
@@ -199,10 +186,8 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
 
         # --------------- Process existing Render Layers nodes ---------------- #
 
-        # Keep track of coordinates of left/right-most and upper/lower-most nodes
-        # in global vars:
-        global x1, y, x2
-        x1, y, x2 = (0, 0, 1000)
+        # Specify y value and left-most and rightmost placement for nodes
+        x1, y, x2 = (0, 0, 1400)
 
         # Process the Render Layer nodes if any exist:
         # rename with view layers and add to processed layers list:
@@ -212,9 +197,6 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             
             for node in all_nodes:
                 # Stop if there are no nodes in the editor:
-
-                # Get location of each node and update x, y with left-most and lower-most:
-                x1, y, x2 = log_node_position_extremes(node.location[0], node.location[1])
 
                 # Process node if it's a Render Layers node:
                 if is_renderlayer_node(node):
