@@ -170,7 +170,7 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             ]
 
 
-        # --------------- Get all the filename and path info ----------------- #
+        # --------------- Get the blendfile name and location path info ----------------- #
 
         # get filename (if saved)
         filename = bpy.path.basename(bpy.data.filepath)
@@ -188,13 +188,16 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         parent_dir = os.path.split(curr_dir)[0]
 
 
-        # ------------------- Set up empty lists and dicts -------------------- #
+        # ---------------- Set up vars, empty lists and dicts ----------------- #
 
         # Keep track of view_layers that have a Render Layer node assigned:
         processed_layers = list()
 
         # Dictionary to store the Render Layer nodes with the view_layer as a value
         render_layer_nodes = dict()
+        
+        # Specify y value and left-most and rightmost placement for nodes
+        x1, x2, y = (0, 1400, 0)
 
 
         # --------------------- Get all layers and nodes ---------------------- #
@@ -204,7 +207,10 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
 
         # List all nodes:
         all_nodes = get_nodes()
-
+        
+        
+        # ----------- Check and log existing Render Layers nodes -------------- #
+        
         # Check if any existing Render Layers nodes have the formal naming:
         # e.g., "Render Layers - my_view_layer"
         for node in all_nodes:
@@ -219,10 +225,9 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                     # flag as processed to skip the view_layer from here on:
                     processed_layers.append(layer)
 
+                    
         # --------------- Process existing Render Layers nodes ---------------- #
 
-        # Specify y value and left-most and rightmost placement for nodes
-        x1, x2, y = (0, 1400, 0)
 
         # Process the Render Layer nodes if any exist:
         # rename with view layers and add to processed layers list:
@@ -327,7 +332,8 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             # Position new node on the lower-right of the existing node graph
             reposition_node(fileout_node, x2, y_loc + 50)
 
-            # -------- Link nodes and Add Denoise nodes if required -------- #
+            
+            # ------ Link nodes (and Add DENOISE nodes if required) ----- #
 
             # Get list of active passes by looking at Render Layers' outputs
             # using a list comprehension (false is a safety net if it fails)
