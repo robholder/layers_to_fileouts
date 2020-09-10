@@ -1,5 +1,5 @@
-# Blender 2.8 addon:
-## View_Layers to EXR Fileouts
+# Layers To Fileouts - View_Layers to EXR Fileouts
+## Blender 2.8 addon:
 
 ## THIS ADDON IS IN BETA - DO NOT USE ON CRITICAL PROJECTS!!
 
