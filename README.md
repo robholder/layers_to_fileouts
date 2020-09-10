@@ -3,7 +3,7 @@
 
 ## THIS ADDON IS IN BETA - DO NOT USE ON CRITICAL PROJECTS!!
 
-This Blender addon is a tool to take all the View_layers in the scene and connect its 'Render Layers' node to a 'Fileout' node in the Compositor - adding each active pass to an input in the 'Fileout' node (to be saved as a layer in the EXR output file).
+This Blender addon is a tool to take all the View_layers in the scene, and creates and connects each corresponding 'Render Layers' node to a 'Fileout' node in the Compositor - adding each active pass to an input in the 'Fileout' node (to be saved as a layer in the EXR output file).
 
 If a View_layer is not enabled, the corresponding 'Render Layers' and 'Fileout' nodes are connected, but are muted.
 
