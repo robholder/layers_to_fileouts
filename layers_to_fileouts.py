@@ -292,10 +292,18 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         rla = render_layer_nodes
         for count, (node, layer) in enumerate(sorted(rla.items(), key=lambda x: x[1])):
 
+
+            # Get list of active passes by looking at Render Layers' outputs
+            # using a list comprehension (false is a safety net if it fails)
+            output_list = [
+                key for key, output in node.outputs.items()
+                if getattr(output, 'enabled', False)
+                ]
+
             # Prepare y offset for location of nodes:
             
-            # arbitrary vertical offset for each new row of nodes:
-            y_offset = 600
+            # base arbitrary vertical offset for each new row of nodes:
+            y_offset = 400
             
             # update y location with offset (multiplied by count of new node)
             y_loc = y-(y_offset * count)
@@ -336,16 +344,6 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             # Position new node on the lower-right of the existing node graph
             reposition_node(fileout_node, x2, y_loc + 50)
 
-            
-            # ------ Link nodes (and Add DENOISE nodes if required) ----- #
-
-            # Get list of active passes by looking at Render Layers' outputs
-            # using a list comprehension (false is a safety net if it fails)
-            output_list = [
-                key for key, output in node.outputs.items()
-                if getattr(output, 'enabled', False)
-                ]
-
             # Up the color-depth to 32 if there are cryptomatte passes:
             for output in output_list:
                 if "Crypto" in output:
@@ -355,6 +353,8 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                 
             # Check if denoise nodes are activated for the render
             denoise_on = set(denoise_passes).issubset(set(output_list))
+            # Reset number of denoise nodes (for vertical graph offset calc later):
+            denoise_num = 0
 
             # Connect Render Layers, Fileouts and Denoise nodes:
             for output in output_list:
@@ -364,6 +364,9 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
 
                 # Check if a denoise node is needed for the Render Layers output:
                 if output in beauty_passes and denoise_on:
+
+                    # keep count of denoise nodes:
+                    denoise_num += 1
 
                     # Create a denoise node
                     denoise_node = create_node("Denoising")
@@ -388,6 +391,17 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                     # link output of Render Layers directly to the Fileout node:
                     link_nodes(node, output, fileout_node, output)
         
+            # Set up updated y position starting offset:
+            # regular Render Layers offset:
+            rl_offset = len(output_list) * 22 - 12
+            # Measure height of denoise stack to offset if taller than Render Layers node:
+            denoise_stack_height = denoise_num * 150 - 350
+
+            if denoise_stack_height > rl_offset:
+                rl_offset = denoise_stack_height
+
+            y = y - rl_offset
+
         return {'FINISHED'}
 
 
