@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "Add Render Passes Fileouts",
+    "name": "Layers to Fileouts",
     "author": "Robert Holder",
     "version": (1, 0),
     "blender": (2, 80, 0),
@@ -136,7 +136,7 @@ def ShowMessageBox(message="", title="Message Box", icon='INFO'):
 
 class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
     bl_idname = "node.render_passes_fileouts"
-    bl_label = "Add Render Layer Fileouts"
+    bl_label = "Layers to Fileouts"
     bl_description = "Manages EXR Fileouts for Render Layers"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
