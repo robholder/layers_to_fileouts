@@ -169,23 +169,27 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             "Denoising Albedo",
             ]
 
+        
+        # --------------- Switch on use_nodes to activate the compositor ---------------- #
+
+        bpy.context.scene.use_nodes = True
+        
 
         # --------------- Get the blendfile name and location path info ----------------- #
+
+        # If the blend file hasn't been saved, set the paths to default
+        curr_dir = "//"
+        parent_dir = "//"
 
         # get filename (if saved)
         filename = bpy.path.basename(bpy.data.filepath)
         filename = os.path.splitext(filename)[0]
 
-        # Stop whole script if scene hasn't been saved:
-        if not filename:
-            print("Save your scene first")
-            # Shows a message box with a message, custom title, and a specific icon
-            ShowMessageBox("Warning", "Save your scene first!", 'ERROR')
-            sys.exit()
-
-        # Furnish file path variables including the parent directory
-        curr_dir = os.path.split(bpy.data.filepath)[0]
-        parent_dir = os.path.split(curr_dir)[0]
+        # If saved, set the render output paths relative to saved file directory:
+        if filename:
+            # Furnish file path variables including the parent directory
+            curr_dir = os.path.split(bpy.data.filepath)[0]
+            parent_dir = os.path.split(curr_dir)[0]
 
 
         # ---------------- Set up vars, empty lists and dicts ----------------- #
