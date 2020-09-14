@@ -289,6 +289,8 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         # un-sorted version
         # for count, (node, layer) in enumerate(render_layer_nodes.items()):
         # sorted version
+        
+        # shorten variable to shorten for loop line!
         rla = render_layer_nodes
         for count, (node, layer) in enumerate(sorted(rla.items(), key=lambda x: x[1])):
 
@@ -391,7 +393,8 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                     # link output of Render Layers directly to the Fileout node:
                     link_nodes(node, output, fileout_node, output)
         
-            # Set up updated y position starting offset:
+            # ------------- Update y offset for next node in list  --------------- #
+
             # regular Render Layers offset:
             rl_offset = len(output_list) * 22 - 12
             # Measure height of denoise stack to offset if taller than Render Layers node:
@@ -401,6 +404,7 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                 rl_offset = denoise_stack_height
 
             y = y - rl_offset
+
 
         return {'FINISHED'}
 
