@@ -338,9 +338,10 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             fileout_node.file_slots.remove(fileout_node.inputs["Image"])
 
             # Create and set File output path: scene filename_view-layer
-            file = "{}_{}.".format(filename, layer)
+            file= "{}.".format(layer)
+
             # Add out Base Path (output)
-            out_path = os.path.join(parent_dir, "render_layers", file)
+            out_path = os.path.join(parent_dir, "render_layers", filename, layer, file)
             fileout_node.base_path = out_path
 
             # Position new node on the lower-right of the existing node graph
