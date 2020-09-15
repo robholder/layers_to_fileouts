@@ -16,124 +16,6 @@ import os
 import sys
 
 
-# -------------------- Functions for the script ----------------------- #
-
-def get_nodes():
-    '''Returns list of nodes'''
-    nodes = bpy.context.scene.node_tree.nodes
-    return nodes
-
-
-def get_layers():
-    '''Returns a list of the view_layers in the scene'''
-    layers = list(set(bpy.context.scene.view_layers.keys()))
-    return layers
-
-
-def is_renderlayer_node(node):
-    '''Return true if node is a Render Layers node'''
-    if node.type == 'R_LAYERS':
-        return True
-
-
-def renderlayer_nodes_view_layer(node):
-    '''Return the view_layer for Render Layers node'''
-    return node.layer
-
-
-def set_layer(node, layer):
-    '''Set node's layer to view_layer'''
-    node.layer = layer
-
-
-def create_node(node_type):
-    '''Creates a specified node'''
-
-    if node_type == "RenderLayers":
-        type = "CompositorNodeRLayers"
-
-    elif node_type == "Denoising":
-        type = "CompositorNodeDenoise"
-
-    elif node_type == "Fileout":
-        type = "CompositorNodeOutputFile"
-
-    else:
-        type = "CompositorNodeDenoise"
-
-    return bpy.context.scene.node_tree.nodes.new(type)
-
-
-def formal_node_name(node, layer):
-    '''Produce a formal node name from the node and the layer name'''
-    stem = node_stem_from_type(node)
-
-    return "{} - {}".format(stem, layer)
-
-
-def rename_and_relabel_node(node, layer_name):
-    '''Rename and Re-label a node appended with the view_layer name'''
-
-    node.name = formal_node_name(node, layer_name)
-    node.label = node.name
-
-
-def formal_denoise_node_name(node, layer, output):
-    '''Produce a formal node name from the node and the layer name'''
-    stem = node_stem_from_type(node)
-
-    return "{}-{} - {}".format(stem, output, layer)
-
-
-def rename_and_relabel_denoise_node(node, layer_name, output):
-    '''Rename and Re-label a node appended with the view_layer name'''
-
-    node.name = formal_denoise_node_name(node, layer_name, output)
-    node.label = node.name
-
-    
-def node_stem_from_type(node):
-    '''Get formal name stem from node type'''
-    if node.type == 'R_LAYERS':
-        stem = "Render_Layers"
-
-    elif node.type == 'DENOISE':
-        stem = "Denoise"
-
-    elif node.type == 'OUTPUT_FILE':
-        stem = "EXR_File_Output"
-
-    return stem
-
-
-def reposition_node(node, x, y):
-    '''Reposition node to given x and y coordinates'''
-    node.location = (x, y)
-
-
-def link_nodes(start_node, output, end_node, input):
-    '''Link output to input between two nodes'''
-    tree = bpy.context.scene.node_tree
-
-    tree.links.new(start_node.outputs[output], end_node.inputs[input])
-
-
-def layer_enabled(node, layer):
-    '''Test if view_layer is enabled'''
-    # Get view_layers path from layer name
-    layer_node = bpy.context.scene.view_layers[layer]
-    if not layer_node.use:
-        node.mute = True
-
-
-def ShowMessageBox(message="", title="Message Box", icon='INFO'):
-    '''Message box to alert the user'''
-    def draw(self, context):
-        self.layout.label(text=message)
-
-    bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
-
-
 class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
     bl_idname = "node.render_passes_fileouts"
     bl_label = "Layers to Fileouts"
@@ -145,6 +27,116 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
 
     def execute(self, context):
         
+        # -------------------- Functions for the script ----------------------- #
+
+        def get_nodes():
+            '''Returns list of nodes'''
+            nodes = bpy.context.scene.node_tree.nodes
+            return nodes
+
+
+        def get_layers():
+            '''Returns a list of the view_layers in the scene'''
+            layers = list(set(bpy.context.scene.view_layers.keys()))
+            return layers
+
+
+        def is_renderlayer_node(node):
+            '''Return true if node is a Render Layers node'''
+            if node.type == 'R_LAYERS':
+                return True
+
+
+        def renderlayer_nodes_view_layer(node):
+            '''Return the view_layer for Render Layers node'''
+            return node.layer
+
+
+        def set_layer(node, layer):
+            '''Set node's layer to view_layer'''
+            node.layer = layer
+
+
+        def create_node(node_type):
+            '''Creates a specified node'''
+
+            if node_type == "RenderLayers":
+                type = "CompositorNodeRLayers"
+
+            elif node_type == "Denoising":
+                type = "CompositorNodeDenoise"
+
+            elif node_type == "Fileout":
+                type = "CompositorNodeOutputFile"
+
+            else:
+                type = "CompositorNodeDenoise"
+
+            return bpy.context.scene.node_tree.nodes.new(type)
+
+
+        def formal_node_name(node, layer):
+            '''Produce a formal node name from the node and the layer name'''
+            stem = node_stem_from_type(node)
+
+            return "{} - {}".format(stem, layer)
+
+
+        def rename_and_relabel_node(node, layer_name):
+            '''Rename and Re-label a node appended with the view_layer name'''
+
+            node.name = formal_node_name(node, layer_name)
+            node.label = node.name
+
+
+        def formal_denoise_node_name(node, layer, output):
+            '''Produce a formal node name from the node and the layer name'''
+            stem = node_stem_from_type(node)
+
+            return "{}-{} - {}".format(stem, output, layer)
+
+
+        def rename_and_relabel_denoise_node(node, layer_name, output):
+            '''Rename and Re-label a node appended with the view_layer name'''
+
+            node.name = formal_denoise_node_name(node, layer_name, output)
+            node.label = node.name
+
+            
+        def node_stem_from_type(node):
+            '''Get formal name stem from node type'''
+            if node.type == 'R_LAYERS':
+                stem = "Render_Layers"
+
+            elif node.type == 'DENOISE':
+                stem = "Denoise"
+
+            elif node.type == 'OUTPUT_FILE':
+                stem = "EXR_File_Output"
+
+            return stem
+
+
+        def reposition_node(node, x, y):
+            '''Reposition node to given x and y coordinates'''
+            node.location = (x, y)
+
+
+        def link_nodes(start_node, output, end_node, input):
+            '''Link output to input between two nodes'''
+            tree = bpy.context.scene.node_tree
+
+            tree.links.new(start_node.outputs[output], end_node.inputs[input])
+
+
+        def layer_enabled(node, layer):
+            '''Test if view_layer is enabled'''
+            # Get view_layers path from layer name
+            layer_node = bpy.context.scene.view_layers[layer]
+            if not layer_node.use:
+                node.mute = True
+
+
         # List of potential beauty passes suitable for denoise treatment:
         beauty_passes = [
             "Image",
