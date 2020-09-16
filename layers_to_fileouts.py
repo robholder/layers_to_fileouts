@@ -205,34 +205,16 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         all_nodes = get_nodes()
         
         
-        # ----------- Check and log existing Render Layers nodes -------------- #
-        
-        # Check if any existing Render Layers nodes have the formal naming:
-        # e.g., "Render Layers - my_view_layer"
-        for node in all_nodes:
-            # check for Render Layers nodes
-            if node.type == 'R_LAYERS':
-                # Get any view layer set on the Render Layers node:
-                layer = renderlayer_nodes_view_layer(node)
-                # Check if name is a formal name (meaning a new one is not required):
-                if node.name == formal_node_name(node, layer):
-                    # add to dictionary to use later (repositioning and linking):
-                    render_layer_nodes[node] = layer
-                    # flag as processed to skip the view_layer from here on:
-                    processed_layers.append(layer)
-
-                    
         # --------------- Process existing Render Layers nodes ---------------- #
-
 
         # Process the Render Layer nodes if any exist:
         # rename with view layers and add to processed layers list:
         # (Ignore if view_layer already has a processed Render Layers node.)
 
+        # Stop if there are no nodes in the editor:
         if len(all_nodes) > 1:
             
             for node in all_nodes:
-                # Stop if there are no nodes in the editor:
 
                 # Process node if it's a Render Layers node:
                 if is_renderlayer_node(node):
@@ -243,8 +225,10 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
                     # Only proceed if view_layer hasn't been in any Render Layers node yet:
                     if layer not in processed_layers:
 
-                        # Rename and Re-label nodes with view_layer name appended:
-                        rename_and_relabel_node(node, layer)
+                        # If the node isn't already named correctly, rename to the correct name
+                        if node.name != formal_node_name(node, layer):
+                            # Rename and Re-label nodes with view_layer name appended:
+                            rename_and_relabel_node(node, layer)
 
                         # Add Render Layers node and corresponding view_layer to dictionary
                         # for later retreval
