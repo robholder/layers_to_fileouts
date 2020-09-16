@@ -1,8 +1,6 @@
 # Layers To Fileouts
 ## Blender 2.8 addon:
 
-## THIS ADDON IS IN BETA - DO NOT USE ON CRITICAL PROJECTS!!
-
 This is a Blender Addon to create Fileout nodes for each View_layer's 'Render Layers' node - and link each active pass from the Render Layers node to an input on the 'Fileout' node's inputs (ready to be saved as a multilayer EXR output file).
 
 If a View_layer is not enabled, the corresponding 'Render Layers' and 'Fileout' nodes are linked, but are muted.
