@@ -1,12 +1,30 @@
+#########################################################################
+# Copyright (C) 2020 Robert Holder
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#########################################################################
+
+
 bl_info = {
     "name": "Layers to Fileouts",
     "author": "Robert Holder",
     "version": (1, 0),
     "blender": (2, 80, 0),
     "location": "Compositor > Node",
-    "description": "Manages EXR Fileouts for Render Layers",
-    "warning": "",
-    "doc_url": "",
+    "description": "Manages EXR Fileouts for Render Layers based on View_Layers",
+    "warning": "", # used for warning icon and text in addons panel
+    "doc_url": "https://github.com/robholder/layers_to_fileouts",
     "category": "Compositing",
 }
 
@@ -224,7 +242,6 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
 
                     # Only proceed if view_layer hasn't been in any Render Layers node yet:
                     if layer not in processed_layers:
-
                         # If the node isn't already named correctly, rename to the correct name
                         if node.name != formal_node_name(node, layer):
                             # Rename and Re-label nodes with view_layer name appended:
