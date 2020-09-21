@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Layers to Fileouts",
     "author": "Robert Holder",
-    "version": (1, 0),
+    "version": (1, 1), # last update: class list registration 
     "blender": (2, 80, 0),
     "location": "Compositor > Node",
     "description": "Manages EXR Fileouts for Render Layers based on View_Layers",
@@ -403,17 +403,24 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
         return {'FINISHED'}
 
 
+classes = [
+    RPASSES_MT_render_passes_fileouts,
+]
+
+
 def menu_func(self, context):
     self.layout.operator(RPASSES_MT_render_passes_fileouts.bl_idname)
     
     
 def register():
-    bpy.utils.register_class(RPASSES_MT_render_passes_fileouts)
+    for cls in classes:
+        bpy.utils.register_class(cls)
     bpy.types.NODE_MT_node.append(menu_func)
     
 
 def unregister():
-    bpy.utils.unregister_class(RPASSES_MT_render_passes_fileouts)
+    for cls in classes:
+        bpy.utils.register_class(cls)
     bpy.types.NODE_MT_node.remove(menu_func)
 
 
