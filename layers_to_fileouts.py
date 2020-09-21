@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Layers to Fileouts",
     "author": "Robert Holder",
-    "version": (1, 1), # last update: class list registration 
+    "version": (1, 1, 1), # last update: fixed mute sticking on render layers nodes
     "blender": (2, 80, 0),
     "location": "Compositor > Node",
     "description": "Manages EXR Fileouts for Render Layers based on View_Layers",
@@ -153,6 +153,8 @@ class RPASSES_MT_render_passes_fileouts(bpy.types.Operator):
             layer_node = bpy.context.scene.view_layers[layer]
             if not layer_node.use:
                 node.mute = True
+            else:
+                node.mute = False
 
 
         # List of potential beauty passes suitable for denoise treatment:
